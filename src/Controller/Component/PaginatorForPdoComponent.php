@@ -1,46 +1,35 @@
 <?php
-/**
- * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- *
- * Licensed under The MIT License
- * For full copyright and license information, please see the LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://cakephp.org CakePHP(tm) Project
- * @since         2.0.0
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
- */
 namespace App\Controller\Component;
 
-use Cake\Controller\Component\PaginatorComponent;
+use Cake\Controller\Component;
 use Cake\Network\Exception\NotFoundException;
 use Cake\Utility\Hash;
 use Cake\Datasource\ConnectionManager;
 
-class PaginatorForPdoComponent extends PaginatorComponent
+class PaginatorForPdoComponent extends Component
 {
+    private $_sortColumns = [];
 
-    public function paginateForPdo($sqlString, array $options = [])
+    public function setSortColumns(array $sortColumns)
     {
-        // $options = $this->validateSort($object, $options);
-        // $options = $this->checkLimit($options);
+        $this->_sortColumns = $sortColumns;
+    }
+
+    public function paginateForPdo($sqlString, array $options)
+    {
         $alias = 'Pager';
         $request = $this->_registry->getController()->request;
         $queryParam = $request->getQueryParams();
         $params = [];
         if (isset($queryParam['sort'])) {
-            $params['order'] = [
-                $queryParam['sort'] => $queryParam['direction'] ?? 'asc'
-            ];
+            $params['order'] = $this->_validateSort($queryParam);
         }
         $params['page'] = $queryParam['page'] ?? 1;
         $options = array_merge($options, $params);
 
         $options += ['page' => 1, 'scope' => null];
         $options['page'] = (int)$options['page'] < 1 ? 1 : (int)$options['page'];
-        $limit = $options['limit'];
+        $limit = (int)$options['limit'];
         $page = $options['page'];
 
         $countSql = sprintf('select count(*) `count` from (%s) count_table', $sqlString);
@@ -95,33 +84,19 @@ class PaginatorForPdoComponent extends PaginatorComponent
         return $results;
     }
 
-    /**
-     * Merges the various options that Pagination uses.
-     * Pulls settings together from the following places:
-     *
-     * - General pagination settings
-     * - Model specific settings.
-     * - Request parameters
-     *
-     * The result of this method is the aggregate of all the option sets combined together. You can change
-     * config value `whitelist` to modify which options/values can be set using request parameters.
-     *
-     * @param string $alias Model alias being paginated, if the general settings has a key with this value
-     *   that key's settings will be used for pagination instead of the general ones.
-     * @param array $settings The settings to merge with the request data.
-     * @return array Array of merged options.
-     */
-    public function mergeOptions($alias, $settings)
+    private function _validateSort($params)
     {
-        $defaults = $this->getDefaults($alias, $settings);
-        $request = $this->_registry->getController()->request;
-        $scope = Hash::get($settings, 'scope', null);
-        $query = $request->getQueryParams();
-        if ($scope) {
-            $query = Hash::get($request->getQueryParams(), $scope, []);
+        $direction  = strtolower($params['direction']) ?? 'asc';
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'asc';
         }
-        $request = array_intersect_key($query, array_flip($this->_config['whitelist']));
 
-        return array_merge($defaults, $request);
+        $sortColumn = $params['sort'];
+        if (in_array($sortColumn, $this->_sortColumns, true)) {
+            return [$sortColumn => $direction];
+        }
+
+        return [];
     }
+
 }

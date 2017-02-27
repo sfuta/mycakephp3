@@ -25,7 +25,8 @@ class SandboxController extends AppController
                 'id' => 'desc'
             ]
         ];
-        $this->set('items', $this->PaginatorForPdo->paginateForPdo('select * from sandbox', $options));
+        $this->PaginatorForPdo->setSortColumns(['id', 'tname']);
+        $this->set('items', $this->PaginatorForPdo->paginateForPdo('select s.id, s.tname from sandbox s', $options));
         // $this->set('items', ConnectionManager::get('default')->execute('select * from sandbox')->fetchAll('assoc'));
     }
 
