@@ -26,8 +26,9 @@ class SandboxController extends AppController
             ]
         ];
         $this->PaginatorForPdo->setSortColumns(['id', 'tname']);
-        $this->set('items', $this->PaginatorForPdo->paginateForPdo('select s.id, s.tname from sandbox s', $options));
-        // $this->set('items', ConnectionManager::get('default')->execute('select * from sandbox')->fetchAll('assoc'));
+        $this->set('items',
+            $this->PaginatorForPdo->paginateForPdo('select s.id, s.tname from sandbox s where id > ?', [20], $options)
+        );
     }
 
     public function index2()

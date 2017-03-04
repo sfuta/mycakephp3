@@ -10,12 +10,27 @@ class PaginatorForPdoComponent extends Component
 {
     private $_sortColumns = [];
 
+    /**
+     * ページのソートに使用するカラム名配列を設定
+     *
+     * @param $sortColumns sortのカラム名からなる配列
+     *
+     */
     public function setSortColumns(array $sortColumns)
     {
         $this->_sortColumns = $sortColumns;
     }
 
-    public function paginateForPdo($sqlString, array $options)
+    /**
+     * ページングしたSQL結果を返す
+     *
+     * @param $sqlString 実行SQL文字列
+     * @param $sqlParams 実行SQLにバインドするパラメータ配列
+     * @param $options  Paginator設定値
+     *
+     * @return array  SQL実行結果
+     */
+    public function paginateForPdo($sqlString, array $sqlParams, array $options)
     {
         $alias = 'Pager';
         $request = $this->_registry->getController()->request;
@@ -40,8 +55,8 @@ class PaginatorForPdoComponent extends Component
             $orderPart = '';
         }
         $pageSql = $sqlString . $orderPart . $limitPart;
-        $results = ConnectionManager::get('default')->execute($pageSql)->fetchAll('assoc') ?? [];
-        $count   = ConnectionManager::get('default')->execute($countSql)->fetch('assoc')['count'] ?? 0;
+        $results = ConnectionManager::get('default')->execute($pageSql, $sqlParams)->fetchAll('assoc') ?? [];
+        $count   = ConnectionManager::get('default')->execute($countSql, $sqlParams)->fetch('assoc')['count'] ?? 0;
         $numResults = count($results);
 
         $pageCount = (int)ceil($count / $limit);
