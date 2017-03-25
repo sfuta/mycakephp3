@@ -1,0 +1,10 @@
+{
+    "FixInfo" : {
+        "name" : "mycake",
+        "detail" : { "key": "detail", "value" : "sandboxs" }
+    },
+    "Info" : {
+        "connection" : "localhost",
+        "detail" : { "key": "detail", "value" : "connection_info" }
+    }
+}

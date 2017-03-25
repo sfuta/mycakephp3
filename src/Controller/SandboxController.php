@@ -41,4 +41,11 @@ class SandboxController extends AppController
         ];
         $this->set('pageItems', $this->paginate($query = TableRegistry::get('PageSandbox')->find()));
     }
+
+    public function dump()
+    {
+        debug(Configure::read('FixInfo'));
+        debug(Configure::read('Info'));
+        die;
+    }
 }

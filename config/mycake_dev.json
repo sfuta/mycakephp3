@@ -1,0 +1,6 @@
+{
+    "Info" : {
+        "connection" : "develop",
+        "detail" : { "key": "detail", "value" : "dev_connect_info" }
+    }
+}

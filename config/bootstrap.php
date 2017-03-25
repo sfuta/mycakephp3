@@ -54,6 +54,7 @@ use Cake\Console\ConsoleErrorHandler;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Core\Configure\Engine\PhpConfig;
+use Cake\Core\Configure\Engine\JsonConfig;
 use Cake\Core\Plugin;
 use Cake\Database\Type;
 use Cake\Datasource\ConnectionManager;
@@ -74,7 +75,12 @@ use Cake\Utility\Security;
  */
 try {
     Configure::config('default', new PhpConfig());
+    Configure::config('json', new JsonConfig());
     Configure::load('app', 'default', false);
+    // project設定
+    Configure::load('mycake', 'json', false);
+    // 別設定で上書き
+    Configure::load('mycake_dev', 'json', false);
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
 }
