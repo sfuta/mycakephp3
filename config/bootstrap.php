@@ -76,11 +76,13 @@ use Cake\Utility\Security;
 try {
     Configure::config('default', new PhpConfig());
     Configure::config('json', new JsonConfig());
-    Configure::load('app', 'default', false);
-    // project設定
-    Configure::load('mycake', 'json', false);
-    // 別設定で上書き
+    // 通常設定(既定値：開発用)
     Configure::load('mycake_dev', 'json', false);
+    Configure::load('app_dev', 'default', false);
+
+    // 本番用設定
+    Configure::load('app', 'default', false);
+    Configure::load('mycake', 'json', false);
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
 }
